@@ -1,0 +1,50 @@
+private int ProveriISBN(string ISBN)
+        {
+            if (ISBN.Count() != 13)
+                return 0;
+            if (ISBN.Substring(0, 3) != "978")
+                return 0;
+            return 1;
+        }
+        private void bUpisi_Click(object sender, EventArgs e)
+        {
+            if (tbISBN.Text != "" && tbNaz.Text!="")
+            {
+                if(ProveriISBN(tbISBN.Text)==0)
+                {
+                    MessageBox.Show("ISBN nije u ispravnom formatu!", "Greska!");
+                    tbISBN.Text = "";
+                    return;
+                }
+                cmd = new OleDbCommand("INSERT INTO KNJIGA (KnjigaID, UDK, ISBN, Naziv) values (@KnjigaID, @UDK, @ISBN, @Naziv)", con);
+                cmd.Parameters.AddWithValue("@KnjigaID", Int32.Parse(tbSif.Text));
+                
+                if (tbUDK.Text != "")
+                    cmd.Parameters.AddWithValue("@UDK", tbUDK.Text);
+                else
+                    cmd.Parameters.AddWithValue("@UDK", DBNull.Value);
+                cmd.Parameters.AddWithValue("@ISBN", Int64.Parse(tbISBN.Text));
+                cmd.Parameters.AddWithValue("@Naziv", tbNaz.Text);
+                con.Open();
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Uspesan upis u bazu!", "Obavestenje!");
+                    tbSif.Text = "";
+                    con.Close();
+                    listView1.Items.Clear();
+                    PopunaListe(cmd, rider);
+                }
+                catch
+                {
+                    MessageBox.Show("Doslo je do greske pri upisu u bazu!", "Greska!");
+                    con.Close();
+                }
+
+            }
+
+            else
+            {
+                MessageBox.Show("Popunite obavezna polja: Sifra, ISBN i Naziv", "Greska!");
+            }
+        }
