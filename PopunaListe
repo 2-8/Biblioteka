@@ -1,0 +1,16 @@
+private void PopunaListe(OleDbCommand cmd, OleDbDataReader rider)
+        {
+            cmd = new OleDbCommand("SELECT * FROM Knjiga", con);
+            con.Open();
+            rider = cmd.ExecuteReader();
+            int i = 0;
+            while (rider.Read())
+            {
+                listView1.Items.Add(rider[0].ToString());
+                listView1.Items[i].SubItems.Add(rider[1].ToString());
+                listView1.Items[i].SubItems.Add(rider[2].ToString());
+                listView1.Items[i].SubItems.Add(rider[3].ToString());
+                i++;
+            }
+            con.Close();
+        }
