@@ -1,0 +1,45 @@
+private void bObrisi_Click(object sender, EventArgs e)
+        {
+            int id = Int32.Parse(tbSif.Text);
+            cmd = new OleDbCommand("SELECT * FROM Na_citanju WHERE KnjigaID=" + id, con);
+            con.Open();
+            rider = cmd.ExecuteReader();
+            rider.Read();
+            if (rider.HasRows)
+            {
+                MessageBox.Show("Nije moguce obrisati ovu knjigu jer je trenutno na citanju!", "Greska!");
+                tbSif.Text = "";
+                con.Close();
+                return;
+            }
+            else
+            {
+                con.Close();
+                cmd = new OleDbCommand("DELETE * FROM Primerak WHERE KnjigaID=" + id, con);
+                con.Open();
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                    con.Close();
+                    cmd = new OleDbCommand("DELETE * FROM Napisali WHERE KnjigaID=" + id, con);
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                    con.Close();
+                    cmd = new OleDbCommand("DELETE * FROM KNJIGA WHERE KnjigaID=" + id, con);
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                    con.Close();
+                    MessageBox.Show("Uspesno brisanje!", "Obavestenje!");
+                    
+                    tbSif.Text = "";
+                    listView1.Items.Clear();
+                    PopunaListe(cmd, rider);
+
+                }
+                catch
+                {
+                    MessageBox.Show("Doslo je do greske pri brisanju!", "Greska!");
+                    con.Close();
+                }
+            }
+        }
