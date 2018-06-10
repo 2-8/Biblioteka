@@ -1,1 +1,1 @@
-# Biblioteka
+# Discrete function in database discovery
