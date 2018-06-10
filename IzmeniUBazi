@@ -1,0 +1,41 @@
+private void bIzmeni_Click(object sender, EventArgs e)
+        {
+
+            if (tbISBN.Text != "" && tbNaz.Text != "")
+            {
+                if (ProveriISBN(tbISBN.Text) == 0)
+                {
+                    MessageBox.Show("ISBN nije u ispravnom formatu!", "Greska!");
+                    tbISBN.Text = "";
+                    return;
+                }
+                cmd = new OleDbCommand("UPDATE KNJIGA SET UDK=@UDK, ISBN=@ISBN, Naziv=@Naziv WHERE KnjigaID="+Int32.Parse(tbSif.Text)+";", con);
+                if (tbUDK.Text != "")
+                    cmd.Parameters.AddWithValue("@UDK", tbUDK.Text);
+                else
+                    cmd.Parameters.AddWithValue("@UDK", DBNull.Value);
+                cmd.Parameters.AddWithValue("@ISBN", Int64.Parse(tbISBN.Text));
+                cmd.Parameters.AddWithValue("@Naziv", tbNaz.Text);
+                con.Open();
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Uspesna izmena!", "Obavestenje!");
+                    tbSif.Text = "";
+                    con.Close();
+                    listView1.Items.Clear();
+                    PopunaListe(cmd, rider);
+                }
+                catch
+                {
+                    MessageBox.Show("Doslo je do greske pri izmeni baze!", "Greska!");
+                    con.Close();
+                }
+
+            }
+
+            else
+            {
+                MessageBox.Show("Popunite obavezna polja: Sifra, ISBN i Naziv", "Greska!");
+            }
+        }
