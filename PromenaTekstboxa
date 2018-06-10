@@ -1,0 +1,52 @@
+private void tbSif_TextChanged(object sender, EventArgs e)
+        {
+            if (tbSif.Text != "")
+            {
+                int id;
+                try
+                {
+                    id = Int32.Parse(tbSif.Text);
+                }
+                catch
+                {
+                    MessageBox.Show("Sifra mora biti broj!", "Greska!");
+                    tbSif.Text = "";
+                    return;
+                }
+                if (id <= 0)
+                {
+                    MessageBox.Show("Sifra mora biti broj veci od 0!", "Greska!");
+                    tbSif.Text = "";
+                    return;
+                }
+                cmd = new OleDbCommand("SELECT * FROM KNJIGA WHERE KnjigaID=" + id, con);
+                con.Open();
+                rider = cmd.ExecuteReader();
+                rider.Read();
+                if (rider.HasRows)
+                {
+                    tbUDK.Text = rider[1].ToString();
+                    tbISBN.Text = rider[2].ToString();
+                    tbNaz.Text = rider[3].ToString();
+                    bUpisi.Enabled = false;
+                    bObrisi.Enabled = true;
+                    bIzmeni.Enabled = true;
+                }
+                else
+                {
+                    tbUDK.Text = "";
+                    tbISBN.Text = "";
+                    tbNaz.Text = "";
+                    bUpisi.Enabled = true;
+                    bObrisi.Enabled = false;
+                    bIzmeni.Enabled = false;
+                }
+                con.Close();
+            }
+            else
+            {
+                tbUDK.Text = "";
+                tbISBN.Text = "";
+                tbNaz.Text = "";
+            }
+        }
