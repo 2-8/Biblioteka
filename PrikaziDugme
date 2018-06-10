@@ -1,0 +1,49 @@
+private void button1_Click(object sender, EventArgs e)
+        {
+           
+            chart1.Series[series].Points.Clear();
+            if (cbKnjiga.Text == "Izaberite citaoca:")
+            {
+                MessageBox.Show("Izaberite citaoca!", "Obavestenje!");
+                return;
+            }
+            int godina;
+            try
+            {
+                godina = Int32.Parse(tbGod.Text);
+            }
+            catch
+            {
+                MessageBox.Show("Godina mora biti broj!", "Greska!");
+                tbGod.Text = "";
+                return;
+            }
+            if (godina < DateTime.Now.Year - 100 || godina > DateTime.Now.Year)
+            {
+                MessageBox.Show("Godina mora biti u prethodnih 100!", "Greska!");
+                tbGod.Text = "";
+                return;
+            }
+
+            string[] splitter = new string[5];
+            int id;
+            splitter = cbKnjiga.Text.Split(' ');
+            id = Int32.Parse(splitter[0]);
+            DataPoint point;
+            double y;
+            for (int i = 1; i <= 12; i++)
+            {
+                cmd = new OleDbCommand("SELECT COUNT(*) FROM (SELECT DISTINCT CitalacID FROM (SELECT * FROM Na_citanju WHERE KnjigaID=@KnjigaID AND year(DatUz)=@year AND month(DatUz)=@month))", con);
+                cmd.Parameters.AddWithValue("@KnjigaID", id);
+                cmd.Parameters.AddWithValue("@year", godina);
+                cmd.Parameters.AddWithValue("@month", i);
+                con.Open();
+                rider = cmd.ExecuteReader();
+                rider.Read();
+                y = double.Parse(rider[0].ToString());
+                point = new DataPoint(i, y);
+                chart1.Series[series].Points.Add(point);
+                con.Close();
+            }
+            
+        }
