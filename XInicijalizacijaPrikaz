@@ -1,0 +1,44 @@
+OleDbConnection con;
+        OleDbCommand cmd;
+        OleDbDataReader rider;
+        string series = "Citaoci";
+        public frmPoCitaocima()
+        {
+            InitializeComponent();
+            string putanja = Environment.CurrentDirectory;
+            string[] putanjaBaze = putanja.Split(new string[] { "bin" }, StringSplitOptions.None);
+            AppDomain.CurrentDomain.SetData("DataDirectory", putanjaBaze[0]);
+            con = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=|DataDirectory|\SkolskaBiblioteka.accdb");
+        }
+
+        private void frmPoCitaocima_Load(object sender, EventArgs e)
+        {
+            cmd = new OleDbCommand("SELECT CitalacID, Ime, Prezime FROM Citalac ORDER BY CitalacID ASC;", con);
+            con.Open();
+            rider=cmd.ExecuteReader();
+            while(rider.Read())
+            {
+                cbCit.Items.Add(rider[0].ToString()+" - "+rider[1].ToString()+' '+rider[2].ToString());
+            }
+            con.Close();
+            cbCit.Text = "Izaberite citaoca:";
+
+            chart1.Series.Clear();
+            chart1.Legends.Clear();
+           
+            chart1.Series.Add(series);
+            chart1.Series[series].ChartType = SeriesChartType.FastLine;
+            chart1.ChartAreas[0].AxisX.Minimum = 0;
+            chart1.ChartAreas[0].AxisX.Maximum = 12;
+            chart1.ChartAreas[0].AxisX.Interval = 2;
+            chart1.ChartAreas[0].AxisY.Minimum = 0;
+            chart1.ChartAreas[0].AxisY.Maximum = 6;
+            chart1.ChartAreas[0].AxisY.Interval = 1;
+            chart1.ChartAreas[0].AxisX.CustomLabels.Add(1.5, 2.5, "Februar");
+            chart1.ChartAreas[0].AxisX.CustomLabels.Add(3.5, 4.5, "April");
+            chart1.ChartAreas[0].AxisX.CustomLabels.Add(5.5, 6.5, "Jun");
+            chart1.ChartAreas[0].AxisX.CustomLabels.Add(7.5, 8.5, "Avgust");
+            chart1.ChartAreas[0].AxisX.CustomLabels.Add(9.5, 10.5, "Oktobar");
+            chart1.ChartAreas[0].AxisX.CustomLabels.Add(11.5, 12.5, "Decembar");
+ 
+        }
