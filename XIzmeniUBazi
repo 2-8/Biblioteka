@@ -1,0 +1,41 @@
+private void bIzmeni_Click(object sender, EventArgs e)
+        {
+            int id = Int32.Parse(tbSif.Text);
+            if (tbMat.Text != "" && tbIme.Text != "" && tbPrez.Text != "" && tbMesto.Text != "")
+            {
+                if (ProveriMaticni(tbMat.Text) == 0)
+                {
+                    MessageBox.Show("Maticni broj nije ispravan!", "Greska!");
+                    tbMat.Text = "";
+                    return;
+                }
+                cmd = new OleDbCommand("UPDATE Citalac SET MaticniBroj=@MaticniBroj, Ime=@Ime, Prezime=@Prezime, Mesto=@Mesto, Adresa=@Adresa, Telefon=@Telefon WHERE CitalacID="+id+" ;", con);
+                cmd.Parameters.AddWithValue("@MaticniBroj", Int64.Parse(tbMat.Text));
+                cmd.Parameters.AddWithValue("@Ime", tbIme.Text);
+                cmd.Parameters.AddWithValue("@Prezime", tbPrez.Text);
+                cmd.Parameters.AddWithValue("@Mesto", tbMesto.Text);
+                if (tbAdr.Text != "")
+                    cmd.Parameters.AddWithValue("@Adresa", tbAdr.Text);
+                else
+                    cmd.Parameters.AddWithValue("@Adresa", DBNull.Value);
+                if (tbTel.Text != "")
+                    cmd.Parameters.AddWithValue("@Telefon", tbTel.Text);
+                else
+                    cmd.Parameters.AddWithValue("@Telefon", DBNull.Value);
+                con.Open();
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Uspesna izmena baze!", "Obavestenje!");
+                    tbSif.Text = "";
+                    con.Close();
+                    listView1.Items.Clear();
+                    PopunaListe(cmd, rider);
+                }
+                catch
+                {
+                    MessageBox.Show("Doslo je do greske pri izmeni baze!", "Greska!");
+                    con.Close();
+                }
+            }
+        }
