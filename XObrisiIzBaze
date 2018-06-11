@@ -1,0 +1,37 @@
+private void bObrisi_Click(object sender, EventArgs e)
+        {
+            int id = Int32.Parse(tbSif.Text);
+            cmd = new OleDbCommand("SELECT * FROM Na_citanju WHERE CitalacID=" + id, con);
+            con.Open();
+            rider = cmd.ExecuteReader();
+            rider.Read();
+            if (rider.HasRows)
+            {
+                MessageBox.Show("Nije moguce obrisati ovog citaoca jer se nalazi u vise od jedne tabele!", "Greska!");
+                tbSif.Text = "";
+                con.Close();
+                return;
+            }
+            else
+            {
+                con.Close();
+                cmd = new OleDbCommand("DELETE * FROM Citalac WHERE CitalacID=" + id, con);
+                con.Open();
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Uspesno brisanje!", "Obavestenje!");
+                    con.Close();
+                    tbSif.Text = "";
+                    listView1.Items.Clear();
+                    PopunaListe(cmd, rider);
+
+                }
+                catch
+                {
+                    MessageBox.Show("Doslo je do greske pri brisanju!", "Greska!");
+                    con.Close();
+                }
+            }
+
+        }
