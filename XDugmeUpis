@@ -1,0 +1,112 @@
+private int ProveriMaticni(string maticni)
+        {
+            string resto;
+            try
+            {
+                resto = maticni.Substring(7);
+            }
+            catch
+            {
+                return 0;
+            }
+            if (resto.Count() != 6)
+            {
+                return 0;
+            }
+            int dan = Int32.Parse(maticni.Substring(0, 2));
+            int mesec = Int32.Parse(maticni.Substring(2, 2));
+            int god=Int32.Parse(maticni.Substring(4, 3));
+            if(god>900)
+            {
+                string godina='1'+god.ToString();
+                god=Int32.Parse(godina);
+            }
+            else if (god < 0 || god > 18)
+            {
+                return 0;
+            }
+            else
+            {
+                string godina;
+                if (god >= 10)
+                {
+                    godina = "20" + god.ToString();
+                }
+                else
+                    godina = "200" + god.ToString();
+                god = Int32.Parse(godina);
+            }
+            if (mesec>12 || mesec<=0)
+                return 0;
+            switch (mesec)
+            {
+                case 1: case 3: case 5: case 7: case 8: case 10: case 12:
+                    if (dan > 31)
+                        return 0;
+                    break;
+                case 4: case 6: case 9: case 11:
+                    if (dan > 30)
+                        return 0;
+                    break;
+                case 2:
+                    if(god%4==0)
+                    {
+                        if (dan > 29)
+                            return 0;
+                    }
+                    else
+                    {
+                        if (dan > 28)
+                            return 0;
+                    }
+                    break;
+            }
+            return 1;
+        }
+        private void bUpisi_Click(object sender, EventArgs e)
+        {
+            if (tbMat.Text != "" && tbIme.Text != "" && tbPrez.Text != "" && tbMesto.Text != "")
+            {
+                if(ProveriMaticni(tbMat.Text)==0)
+                {
+                    MessageBox.Show("Maticni broj nije ispravan!", "Greska!");
+                    tbMat.Text = "";
+                    return;
+                }
+                cmd = new OleDbCommand("INSERT INTO Citalac (CitalacID, MaticniBroj, Ime, Prezime, Mesto, Adresa, Telefon) values (@CitalacID, @MaticniBroj, @Ime, @Prezime, @Mesto, @Adresa, @Telefon)", con);
+                cmd.Parameters.AddWithValue("@CitalacID", Int32.Parse(tbSif.Text));
+                cmd.Parameters.AddWithValue("@MaticniBroj", Int64.Parse(tbMat.Text));
+                cmd.Parameters.AddWithValue("@Ime", tbIme.Text);
+                cmd.Parameters.AddWithValue("@Prezime", tbPrez.Text);
+                cmd.Parameters.AddWithValue("@Mesto", tbMesto.Text);
+                if (tbAdr.Text != "")
+                    cmd.Parameters.AddWithValue("@Adresa", tbAdr.Text);
+                else
+                    cmd.Parameters.AddWithValue("@Adresa", DBNull.Value);
+                if (tbTel.Text != "")
+                    cmd.Parameters.AddWithValue("@Telefon", tbTel.Text);
+                else
+                    cmd.Parameters.AddWithValue("@Telefon", DBNull.Value);
+                con.Open();
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Uspesan upis u bazu!", "Obavestenje!");
+                    tbSif.Text = "";
+                    con.Close();
+                    listView1.Items.Clear();
+                    PopunaListe(cmd, rider);
+                }
+                catch
+                {
+                    MessageBox.Show("Doslo je do greske pri upisu u bazu!", "Greska!");
+                    con.Close();
+                }
+
+            }
+
+            else
+            {
+                MessageBox.Show("Popunite obavezna polja: Sifra, Maticni broj, Ime, Prezime i Mesto!", "Greska!");
+            }
+        }
